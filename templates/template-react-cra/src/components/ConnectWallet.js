@@ -1,31 +1,56 @@
-import { AppConfig, UserSession } from "@stacks/connect";
-import { useConnect } from "@stacks/connect-react";
-
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { useState, useEffect } from "react";
 
 const ConnectWallet = () => {
-  const { doAuth } = useConnect();
+  const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState("");
 
-  if (userSession.isUserSignedIn()) {
+  const updateState = () => {
+    const isUserConnected = isConnected();
+    setConnected(isUserConnected);
+
+    if (isUserConnected) {
+      const storage = getLocalStorage();
+      if (storage && storage.addresses?.stx?.[0]?.address) {
+        setAddress(storage.addresses.stx[0].address);
+      }
+    }
+  };
+
+  useEffect(() => {
+    updateState();
+  }, []);
+
+  async function authenticate() {
+    await connect({
+      network: "testnet",
+    });
+    updateState();
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    updateState();
+  }
+
+  if (connected) {
     return (
       <div>
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>STX Address: {address}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={doAuth}>
+    <button className="Connect" onClick={authenticate}>
       Connect Wallet
     </button>
   );

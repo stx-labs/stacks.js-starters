@@ -1,40 +1,45 @@
-import { showConnect } from "@stacks/connect";
-
-import { userSession } from "../user-session";
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks React Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+  request,
+} from "@stacks/connect";
+import { useState } from "react";
 
 const ConnectWallet = () => {
-  if (userSession.isUserSignedIn()) {
+  const [, setRefresh] = useState(0);
+  const refresh = () => setRefresh((n) => n + 1);
+  const storage = getLocalStorage();
+
+  if (isConnected() && storage) {
     return (
       <div>
-        <button className="Connect" onClick={disconnect}>
+        <button
+          className="Connect"
+          onClick={() => {
+            disconnect();
+            refresh();
+          }}
+        >
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>BTC Address: {storage.addresses.btc[0].address}</p>
+        <p>STX Address: {storage.addresses.stx[0].address}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button
+      className="Connect"
+      onClick={async () => {
+        await request("getAddresses", {
+          network: "testnet",
+        });
+        refresh();
+      }}
+    >
       Connect Wallet
     </button>
   );

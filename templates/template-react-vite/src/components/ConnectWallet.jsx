@@ -1,34 +1,50 @@
-import { showConnect } from "@stacks/connect";
-
-import { userSession } from "../user-session";
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks React Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { useState, useEffect } from "react";
 
 const ConnectWallet = () => {
-  if (userSession.isUserSignedIn()) {
+  const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState("");
+
+  const updateState = () => {
+    const isUserConnected = isConnected();
+    setConnected(isUserConnected);
+
+    if (isUserConnected) {
+      const storage = getLocalStorage();
+      if (storage && storage.addresses?.stx?.[0]?.address) {
+        setAddress(storage.addresses.stx[0].address);
+      }
+    }
+  };
+
+  useEffect(() => {
+    updateState();
+  }, []);
+
+  async function authenticate() {
+    await connect({
+      network: "testnet",
+    });
+    updateState();
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    updateState();
+  }
+
+  if (connected) {
     return (
       <div>
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>STX Address: {address}</p>
       </div>
     );
   }

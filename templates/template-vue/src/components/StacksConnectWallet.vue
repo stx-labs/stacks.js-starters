@@ -1,38 +1,47 @@
 <script setup>
-import { showConnect } from "@stacks/connect";
-import { userSession } from '../stacksUserSession';
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { ref, onMounted } from "vue";
 
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Vue Starter",
-      icon: window.location.origin + "/logo277.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
+const connected = ref(false);
+const address = ref("");
+
+function updateState() {
+  connected.value = isConnected();
+  const storage = getLocalStorage();
+  if (connected.value && storage && storage.addresses?.stx?.[0]?.address) {
+    address.value = storage.addresses.stx[0].address;
+  }
 }
 
-function disconnect() {
-  userSession.signUserOut("/");
+onMounted(() => {
+  updateState();
+});
+
+async function authenticate() {
+  await connect({
+    network: "testnet",
+  });
+  updateState();
+}
+
+function handleDisconnect() {
+  disconnect();
+  updateState();
 }
 </script>
 
 <template>
-  <div v-if="userSession.isUserSignedIn()">
-    <button @click="disconnect">
-      Disconnect Wallet
-    </button>
-    <p>mainnet: {{  userSession.loadUserData().profile.stxAddress.mainnet  }}</p>
-    <p>testnet: {{  userSession.loadUserData().profile.stxAddress.testnet  }}</p>
+  <div v-if="connected">
+    <button @click="handleDisconnect">Disconnect Wallet</button>
+    <p>STX Address: {{ address }}</p>
   </div>
   <div v-else>
-    <button @click="authenticate">
-      Connect Wallet
-    </button>
+    <button @click="authenticate">Connect Wallet</button>
   </div>
 </template>
 

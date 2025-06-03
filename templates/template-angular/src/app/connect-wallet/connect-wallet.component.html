@@ -1,11 +1,10 @@
-<div *ngIf="userSession.isUserSignedIn(); then thenBlock else elseBlock"></div>
+<div *ngIf="connected; then thenBlock else elseBlock"></div>
 <ng-template #thenBlock>
   <div>
-    <button (click)="disconnect()">
+    <button (click)="handleDisconnect()">
       Disconnect Wallet
     </button>
-    <p>mainnet: {{ userSession.loadUserData().profile.stxAddress.mainnet }}</p>
-    <p>testnet: {{ userSession.loadUserData().profile.stxAddress.testnet }}</p>
+    <p>STX Address: {{ address }}</p>
   </div>
 </ng-template>
 <ng-template #elseBlock>

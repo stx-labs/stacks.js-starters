@@ -1,31 +1,44 @@
 <script>
-  import { showConnect } from "@stacks/connect";
-  import { userSession } from "$lib/stacksUserSession";
+  import {
+    connect,
+    disconnect,
+    getLocalStorage,
+    isConnected,
+  } from "@stacks/connect";
+  import { onMount } from 'svelte';
 
-  export function authenticate() {
-    showConnect({
-      appDetails: {
-        name: "Stacks Svelte Starter",
-        icon: window.location.origin + "/svelte.png",
-      },
-      redirectTo: "/",
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
+  let connected = false;
+  let address = '';
+
+  function updateState() {
+    connected = isConnected();
+    const storage = getLocalStorage();
+    if (connected && storage && storage.addresses?.stx?.[0]?.address) {
+      address = storage.addresses.stx[0].address;
+    }
   }
 
-  export function disconnect() {
-    userSession.signUserOut("/");
+  onMount(() => {
+    updateState();
+  });
+
+  async function authenticate() {
+    await connect({
+      network: "testnet",
+    });
+    updateState();
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    updateState();
   }
 </script>
 
 <div>
-  {#if userSession.isUserSignedIn()}
-    <button on:click={disconnect}> Disconnect Wallet </button>
-    <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-    <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+  {#if connected}
+    <button on:click={handleDisconnect}> Disconnect Wallet </button>
+    <p>STX Address: {address}</p>
   {:else}
     <button on:click={authenticate}> Connect Wallet </button>
   {/if}

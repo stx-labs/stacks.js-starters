@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { showConnect } from '@stacks/connect';
-import { userSession } from 'src/stacksUserSession';
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from '@stacks/connect';
 
 @Component({
   selector: 'app-connect-wallet',
@@ -8,27 +12,32 @@ import { userSession } from 'src/stacksUserSession';
   styleUrls: ['./connect-wallet.component.css'],
 })
 export class ConnectWalletComponent implements OnInit {
+  connected = false;
+  address = '';
+
   constructor() {}
 
-  ngOnInit(): void {}
-
-  public userSession = userSession;
-
-  authenticate() {
-    showConnect({
-      appDetails: {
-        name: 'Stacks Angular Starter',
-        icon: window.location.origin + '/logo240.png',
-      },
-      redirectTo: '/',
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
+  ngOnInit(): void {
+    this.updateState();
   }
 
-  disconnect() {
-    userSession.signUserOut('/');
+  updateState() {
+    this.connected = isConnected();
+    const storage = getLocalStorage();
+    if (this.connected && storage && storage.addresses?.stx?.[0]?.address) {
+      this.address = storage.addresses.stx[0].address;
+    }
+  }
+
+  async authenticate() {
+    await connect({
+      network: 'testnet',
+    });
+    this.updateState();
+  }
+
+  handleDisconnect() {
+    disconnect();
+    this.updateState();
   }
 }

@@ -1,42 +1,63 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
-
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Next.js Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
 
 const ConnectWallet = () => {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [connected, setConnected] = useState(false);
+  const [address, setAddress] = useState("");
 
-  if (mounted && userSession.isUserSignedIn()) {
+  useEffect(() => {
+    setMounted(true);
+    updateState();
+  }, []);
+
+  const updateState = () => {
+    const isUserConnected = isConnected();
+    setConnected(isUserConnected);
+
+    if (isUserConnected) {
+      const storage = getLocalStorage();
+      if (storage && storage.addresses?.stx?.[0]?.address) {
+        setAddress(storage.addresses.stx[0].address);
+      }
+    }
+  };
+
+  async function authenticate() {
+    await connect({
+      network: "testnet",
+      onFinish: () => {
+        updateState();
+      },
+      onCancel: () => {
+        // Handle cancelation if needed
+      },
+    });
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    updateState();
+  }
+
+  if (!mounted) {
+    return null; // Or a loading indicator
+  }
+
+  if (connected) {
     return (
       <div className="Container">
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>STX Address: {address}</p>
       </div>
     );
   }

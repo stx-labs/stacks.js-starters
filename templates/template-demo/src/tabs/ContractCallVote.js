@@ -1,45 +1,41 @@
-import { useConnect } from "@stacks/connect-react";
+import { isConnected, getLocalStorage, request } from "@stacks/connect";
 import { StacksTestnet } from "@stacks/network";
 import {
   AnchorMode,
   callReadOnlyFunction,
-  PostConditionMode, stringUtf8CV
+  PostConditionMode,
+  stringUtf8CV,
 } from "@stacks/transactions";
 import { useState } from "react";
 import { userSession } from "../userSession";
-
-const testnet = new StacksTestnet();
 
 const ContractCallVote = ({ addTx }) => {
   const [votes, setVotes] = useState();
   const [pick, setPick] = useState();
 
-  const { doContractCall } = useConnect();
-
-  if (!userSession.isUserSignedIn()) {
+  if (!isConnected()) {
     return <p>Connect wallet first</p>;
   }
 
-  const address = userSession.loadUserData().profile.stxAddress.testnet;
+  const address = getLocalStorage().addresses.stx[0].address;
 
-  function vote() {
-    doContractCall({
-      network: testnet,
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST10GH0ED2YA6AN2BT94N75KMVJAC3DGARE3W1VP9",
-      contractName: "slight-crimson-ape",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        addTx(data.txId);
-        console.log("data", data);
-      },
-      onCancel: () => {
-        console.log("Transaction was canceled");
-      },
-    });
+  async function vote() {
+    try {
+      const result = await request("stx_callContract", {
+        network: "testnet",
+        contract:
+          "ST10GH0ED2YA6AN2BT94N75KMVJAC3DGARE3W1VP9.slight-crimson-ape",
+        functionName: "vote",
+        functionArgs: [stringUtf8CV(pick)],
+        postConditionMode: "deny",
+        postConditions: [],
+      });
+      console.log("result", result);
+
+      addTx(result.txId);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function refreshCount() {
@@ -48,7 +44,7 @@ const ContractCallVote = ({ addTx }) => {
       contractName: "slight-crimson-ape",
       functionName: "get-data",
       functionArgs: [],
-      network: testnet,
+      network: "testnet",
       senderAddress: address,
     });
     setVotes({
