@@ -1,16 +1,8 @@
-<div *ngIf="connected; then thenBlock else elseBlock"></div>
-<ng-template #thenBlock>
-  <div>
-    <button (click)="handleDisconnect()">
-      Disconnect Wallet
-    </button>
-    <p>STX Address: {{ address }}</p>
-  </div>
-</ng-template>
-<ng-template #elseBlock>
-  <div>
-    <button (click)="authenticate()">
-      Connect Wallet
-    </button>
-  </div>
-</ng-template>
+<div *ngIf="connected">
+    <button (click)="handleDisconnect()">Disconnect Wallet</button>
+    <p>STX Address: {{ stxAddress }}</p>
+</div>
+
+<div *ngIf="!connected">
+    <button (click)="handleConnect()">Connect Wallet</button>
+</div>

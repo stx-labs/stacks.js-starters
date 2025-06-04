@@ -13,7 +13,7 @@ import {
 })
 export class ConnectWalletComponent implements OnInit {
   connected = false;
-  address = '';
+  stxAddress = '';
 
   constructor() {}
 
@@ -21,22 +21,26 @@ export class ConnectWalletComponent implements OnInit {
     this.updateState();
   }
 
-  updateState() {
+  updateState(): void {
     this.connected = isConnected();
-    const storage = getLocalStorage();
-    if (this.connected && storage && storage.addresses?.stx?.[0]?.address) {
-      this.address = storage.addresses.stx[0].address;
+    if (this.connected) {
+      const storage = getLocalStorage();
+      this.stxAddress = storage?.addresses?.stx?.[0]?.address || '';
+    } else {
+      this.stxAddress = '';
     }
   }
 
-  async authenticate() {
-    await connect({
-      network: 'testnet',
-    });
-    this.updateState();
+  async handleConnect(): Promise<void> {
+    try {
+      await connect();
+      this.updateState();
+    } catch (error) {
+      console.error('Failed to connect:', error);
+    }
   }
 
-  handleDisconnect() {
+  handleDisconnect(): void {
     disconnect();
     this.updateState();
   }

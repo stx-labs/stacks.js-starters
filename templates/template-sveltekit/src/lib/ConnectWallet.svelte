@@ -7,31 +7,39 @@
   } from "@stacks/connect";
   import { onMount } from 'svelte';
 
-  let connected = false;
-  let address = '';
+  let version = 0; // Reactive trigger
 
-  function updateState() {
-    connected = isConnected();
-    const storage = getLocalStorage();
-    if (connected && storage && storage.addresses?.stx?.[0]?.address) {
-      address = storage.addresses.stx[0].address;
+  // Re-evaluate when version changes.
+  // The expression (version, isConnected()) ensures reactivity to 'version'.
+  $: connected = (version, isConnected());
+
+  // Re-evaluate when version or connected changes.
+  $: address = (() => {
+    version; // Explicitly depend on version to ensure re-evaluation
+    if (connected) {
+      const storage = getLocalStorage();
+      return storage?.addresses?.stx?.[0]?.address || '';
     }
-  }
+    return '';
+  })();
 
   onMount(() => {
-    updateState();
+    version++; // Trigger initial state evaluation
   });
 
   async function authenticate() {
-    await connect({
-      network: "testnet",
-    });
-    updateState();
+    try {
+      await connect();
+      version++; // Trigger reactivity
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
+    }
   }
 
   function handleDisconnect() {
     disconnect();
-    updateState();
+    version++; // Trigger reactivity
   }
 </script>
 

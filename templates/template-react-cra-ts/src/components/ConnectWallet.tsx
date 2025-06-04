@@ -3,45 +3,26 @@ import {
   disconnect,
   getLocalStorage,
   isConnected,
-  request,
 } from "@stacks/connect";
-import { useState, useEffect } from "react";
+import { useReducer } from "react";
 
 const ConnectWallet = () => {
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState("");
+  const reload = useReducer((s) => s + 1, 0)[1];
 
-  const updateState = () => {
-    const isUserConnected = isConnected();
-    setConnected(isUserConnected);
+  const address =
+    isConnected() && getLocalStorage()?.addresses?.stx?.[0]?.address;
 
-    if (isUserConnected) {
-      const storage = getLocalStorage();
-      if (storage && storage.addresses?.stx?.[0]?.address) {
-        setAddress(storage.addresses.stx[0].address);
-      }
-    }
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
-
-  async function authenticate() {
-    // Using request("getAddresses", ...) as an alternative to connect()
-    // to demonstrate its usage, as connect() is already used in other templates.
-    await request("getAddresses", {
-      network: "testnet",
-    });
-    updateState();
+  async function handleConnect() {
+    await connect();
+    reload();
   }
 
   function handleDisconnect() {
     disconnect();
-    updateState();
+    reload();
   }
 
-  if (connected) {
+  if (address) {
     return (
       <div>
         <button className="Connect" onClick={handleDisconnect}>
@@ -53,7 +34,7 @@ const ConnectWallet = () => {
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

@@ -4,53 +4,43 @@ import {
   getLocalStorage,
   isConnected,
 } from "@stacks/connect";
-import { useState, useEffect } from "react";
+import { useReducer } from "react";
 
 const ConnectWallet = () => {
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState("");
+  const reload = useReducer((s) => s + 1, 0)[1];
 
-  const updateState = () => {
-    const isUserConnected = isConnected();
-    setConnected(isUserConnected);
+  const stxAddress = isConnected()
+    ? getLocalStorage()?.addresses?.stx?.[0]?.address
+    : undefined;
 
-    if (isUserConnected) {
-      const storage = getLocalStorage();
-      if (storage && storage.addresses?.stx?.[0]?.address) {
-        setAddress(storage.addresses.stx[0].address);
-      }
+  async function handleConnect() {
+    try {
+      await connect();
+      reload();
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
     }
-  };
-
-  useEffect(() => {
-    updateState();
-  }, []);
-
-  async function authenticate() {
-    await connect({
-      network: "testnet",
-    });
-    updateState();
   }
 
   function handleDisconnect() {
     disconnect();
-    updateState();
+    reload();
   }
 
-  if (connected) {
+  if (stxAddress) {
     return (
       <div>
         <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>STX Address: {address}</p>
+        <p>STX Address: {stxAddress}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

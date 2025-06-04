@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import {
   connect,
   disconnect,
@@ -8,62 +8,51 @@ import {
   isConnected,
 } from "@stacks/connect";
 
-const ConnectWallet = () => {
-  const [mounted, setMounted] = useState(false);
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState("");
+const ConnectWallet: React.FC = () => {
+  const [hydrated, setHydrated] = useState(false);
+  const reload = useReducer((s) => s + 1, 0)[1];
 
   useEffect(() => {
-    setMounted(true);
-    updateState();
+    setHydrated(true);
   }, []);
 
-  const updateState = () => {
-    const isUserConnected = isConnected();
-    setConnected(isUserConnected);
+  const stxAddress =
+    hydrated && isConnected()
+      ? getLocalStorage()?.addresses?.stx?.[0]?.address
+      : undefined;
 
-    if (isUserConnected) {
-      const storage = getLocalStorage();
-      if (storage && storage.addresses?.stx?.[0]?.address) {
-        setAddress(storage.addresses.stx[0].address);
-      }
-    }
-  };
-
-  async function authenticate() {
+  async function handleConnect() {
     try {
-      await connect({
-        network: "testnet",
-      });
-      updateState();
+      await connect(); // Use default options
+      reload();
     } catch (error) {
-      // Handle connection error if needed
-      console.error("Connection failed", error);
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
     }
   }
 
   function handleDisconnect() {
     disconnect();
-    updateState();
+    reload();
   }
 
-  if (!mounted) {
+  if (!hydrated) {
     return null; // Or a loading indicator
   }
 
-  if (connected) {
+  if (stxAddress) {
     return (
       <div className="Container">
         <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>STX Address: {address}</p>
+        <p>STX Address: {stxAddress}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

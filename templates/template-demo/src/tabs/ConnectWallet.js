@@ -11,11 +11,18 @@ const ConnectWallet = () => {
 
   // load account address if wallet connected
   const isUserSignedIn = isConnected();
-  const address = isUserSignedIn
-    ? getLocalStorage().addresses.stx[0].address
+  const stxAddress = isUserSignedIn
+    ? getLocalStorage()?.addresses?.stx?.[0]?.address
+    : undefined;
+
+  const truncatedAddress = stxAddress
+    ? `${stxAddress.slice(0, 4)}…${stxAddress.slice(-4)}`
     : "";
 
-  const truncatedAddress = `${address.slice(0, 4)}…${address.slice(-4)}`;
+  function handleDisconnect() {
+    disconnect();
+    refresh();
+  }
 
   return (
     <div className="tab">
@@ -38,9 +45,7 @@ const ConnectWallet = () => {
         <br />
         <button
           onClick={async () => {
-            await connect({
-              network: "testnet",
-            });
+            await connect();
             refresh();
           }}
         >
@@ -48,7 +53,7 @@ const ConnectWallet = () => {
         </button>
         <br />
         <br />
-        <button onClick={disconnect}>Disconnect Wallet</button>
+        <button onClick={handleDisconnect}>Disconnect Wallet</button>
         <p>
           <strong>isConnected:</strong> <code>{isConnected().toString()}</code>
         </p>

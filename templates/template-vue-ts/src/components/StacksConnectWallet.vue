@@ -5,43 +5,46 @@ import {
   getLocalStorage,
   isConnected,
 } from "@stacks/connect";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
-const connected = ref(false);
-const address = ref("");
+const version = ref(0); // Reactive trigger
 
-function updateState() {
-  connected.value = isConnected();
-  const storage = getLocalStorage();
-  if (connected.value && storage && storage.addresses?.stx?.[0]?.address) {
-    address.value = storage.addresses.stx[0].address;
+const stxAddress = computed(() => {
+  version.value; // Depend on version to trigger re-computation
+  if (isConnected()) {
+    const storage = getLocalStorage();
+    return storage?.addresses?.stx?.[0]?.address;
   }
-}
-
-onMounted(() => {
-  updateState();
+  return undefined;
 });
 
-async function authenticate() {
-  await connect({
-    network: "testnet",
-  });
-  updateState();
+onMounted(() => {
+  version.value++; // Initial trigger to evaluate computed property
+});
+
+async function handleConnect() {
+  try {
+    await connect(); // Use default options
+    version.value++; // Trigger re-computation
+  } catch (error) {
+    console.error("Failed to connect:", error);
+    // Optionally, handle connection error state here
+  }
 }
 
 function handleDisconnect() {
   disconnect();
-  updateState();
+  version.value++; // Trigger re-computation
 }
 </script>
 
 <template>
-  <div v-if="connected">
+  <div v-if="stxAddress">
     <button @click="handleDisconnect">Disconnect Wallet</button>
-    <p>STX Address: {{ address }}</p>
+    <p>STX Address: {{ stxAddress }}</p>
   </div>
   <div v-else>
-    <button @click="authenticate">Connect Wallet</button>
+    <button @click="handleConnect">Connect Wallet</button>
   </div>
 </template>
 

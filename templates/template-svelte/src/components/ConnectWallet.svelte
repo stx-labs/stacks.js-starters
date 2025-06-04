@@ -7,40 +7,46 @@
   } from "@stacks/connect";
   import { onMount } from 'svelte';
 
-  let connected = false;
-  let address = '';
+  let version = 0; // Reactive trigger
 
-  function updateState() {
-    connected = isConnected();
-    const storage = getLocalStorage();
-    if (connected && storage && storage.addresses?.stx?.[0]?.address) {
-      address = storage.addresses.stx[0].address;
+  // Re-evaluate address when version changes.
+  $: address = (() => {
+    version; // Explicitly depend on version to ensure re-evaluation
+    if (isConnected()) {
+      const storage = getLocalStorage();
+      return storage?.addresses?.stx?.[0]?.address || '';
     }
-  }
+    return '';
+  })();
 
   onMount(() => {
-    updateState();
+    version++; // Trigger initial state evaluation
   });
 
-  async function authenticate() {
-    await connect({
-      network: "testnet",
-    });
-    updateState();
+  async function handleConnect() {
+    try {
+      await connect(); // Use default options
+      version++; // Trigger reactivity
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
+    }
   }
 
   function handleDisconnect() {
     disconnect();
-    updateState();
+    version++; // Trigger reactivity
   }
 </script>
 
 <div>
-  {#if connected}
+  {#if isConnected()}
     <button on:click={handleDisconnect}> Disconnect Wallet </button>
-    <p>STX Address: {address}</p>
+    {#if address}
+        <p>STX Address: {address}</p>
+    {/if}
   {:else}
-    <button on:click={authenticate}> Connect Wallet </button>
+    <button on:click={handleConnect}> Connect Wallet </button>
   {/if}
 </div>
 

@@ -3,29 +3,29 @@ import {
   disconnect,
   getLocalStorage,
   isConnected,
-  request,
 } from "@stacks/connect";
-import { useState } from "react";
+import { useReducer } from "react";
 
 const ConnectWallet = () => {
-  const [, setRefresh] = useState(0);
-  const refresh = () => setRefresh((n) => n + 1);
-  const storage = getLocalStorage();
+  const reload = useReducer((s) => s + 1, 0)[1];
 
-  if (isConnected() && storage) {
+  const stxAddress = isConnected()
+    ? getLocalStorage()?.addresses?.stx?.[0]?.address
+    : undefined;
+
+  if (stxAddress) {
     return (
       <div>
         <button
           className="Connect"
           onClick={() => {
             disconnect();
-            refresh();
+            reload();
           }}
         >
           Disconnect Wallet
         </button>
-        <p>BTC Address: {storage.addresses.btc[0].address}</p>
-        <p>STX Address: {storage.addresses.stx[0].address}</p>
+        <p>STX Address: {stxAddress}</p>
       </div>
     );
   }
@@ -34,10 +34,8 @@ const ConnectWallet = () => {
     <button
       className="Connect"
       onClick={async () => {
-        await request("getAddresses", {
-          network: "testnet",
-        });
-        refresh();
+        await connect();
+        reload();
       }}
     >
       Connect Wallet
