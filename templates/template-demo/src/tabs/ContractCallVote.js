@@ -1,13 +1,6 @@
-import { isConnected, getLocalStorage, request } from "@stacks/connect";
-import { StacksTestnet } from "@stacks/network";
-import {
-  AnchorMode,
-  callReadOnlyFunction,
-  PostConditionMode,
-  stringUtf8CV,
-} from "@stacks/transactions";
+import { getLocalStorage, isConnected, request } from "@stacks/connect";
+import { callReadOnlyFunction, stringUtf8CV } from "@stacks/transactions";
 import { useState } from "react";
-import { userSession } from "../userSession";
 
 const ContractCallVote = ({ addTx }) => {
   const [votes, setVotes] = useState();
