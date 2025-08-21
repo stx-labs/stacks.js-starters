@@ -1,8 +1,12 @@
-<div *ngIf="connected">
+@if (connected) {
+  <div>
     <button (click)="handleDisconnect()">Disconnect Wallet</button>
     <p>STX Address: {{ stxAddress }}</p>
-</div>
+  </div>
+}
 
-<div *ngIf="!connected">
+@if (!connected) {
+  <div>
     <button (click)="handleConnect()">Connect Wallet</button>
-</div>
+  </div>
+}
