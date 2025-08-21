@@ -1,38 +1,47 @@
 <script setup>
-import { showConnect } from "@stacks/connect";
-import { userSession } from '../stacksUserSession';
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { ref, computed } from "vue";
 
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Vue Starter",
-      icon: window.location.origin + "/logo277.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
+const version = ref(0); // Reactive trigger
+
+const stxAddress = computed({
+  get: function () {
+    return isConnected()
+      ? getLocalStorage()?.addresses?.stx?.[0]?.address
+      : undefined;
+  },
+});
+
+async function handleConnect() {
+  try {
+    await connect();
+    version.value++; // Trigger re-mount
+  } catch (error) {
+    console.error("Failed to connect:", error);
+    // Optionally, handle connection error state here
+  }
 }
 
-function disconnect() {
-  userSession.signUserOut("/");
+function handleDisconnect() {
+  disconnect();
+  version.value++; // Trigger re-mount
 }
 </script>
 
 <template>
-  <div v-if="userSession.isUserSignedIn()">
-    <button @click="disconnect">
-      Disconnect Wallet
-    </button>
-    <p>mainnet: {{  userSession.loadUserData().profile.stxAddress.mainnet  }}</p>
-    <p>testnet: {{  userSession.loadUserData().profile.stxAddress.testnet  }}</p>
-  </div>
-  <div v-else>
-    <button @click="authenticate">
-      Connect Wallet
-    </button>
+  <div :key="version">
+    <div v-if="stxAddress">
+      <button @click="handleDisconnect">Disconnect Wallet</button>
+      <p>STX Address: {{ stxAddress }}</p>
+    </div>
+    <div v-else>
+      <button @click="handleConnect">Connect Wallet</button>
+    </div>
   </div>
 </template>
 

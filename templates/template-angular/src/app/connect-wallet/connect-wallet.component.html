@@ -1,17 +1,12 @@
-<div *ngIf="userSession.isUserSignedIn(); then thenBlock else elseBlock"></div>
-<ng-template #thenBlock>
+@if (connected) {
   <div>
-    <button (click)="disconnect()">
-      Disconnect Wallet
-    </button>
-    <p>mainnet: {{ userSession.loadUserData().profile.stxAddress.mainnet }}</p>
-    <p>testnet: {{ userSession.loadUserData().profile.stxAddress.testnet }}</p>
+    <button (click)="handleDisconnect()">Disconnect Wallet</button>
+    <p>STX Address: {{ stxAddress }}</p>
   </div>
-</ng-template>
-<ng-template #elseBlock>
+}
+
+@if (!connected) {
   <div>
-    <button (click)="authenticate()">
-      Connect Wallet
-    </button>
+    <button (click)="handleConnect()">Connect Wallet</button>
   </div>
-</ng-template>
+}

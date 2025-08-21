@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConnectWallet from "../tabs/ConnectWallet";
 import ContractCallVote from "../tabs/ContractCallVote";
-import { userSession } from "../userSession";
+import { isConnected } from "@stacks/connect";
 
 const tabs = {
   "Connect Wallet": ConnectWallet,
@@ -12,10 +12,13 @@ const tabs = {
 const initial = Object.keys(tabs)[0];
 
 const AppTabs = ({ addTx }) => {
+  const [connected, setConnected] = useState(false);
   const [tab, setTab] = useState(initial);
   const Tab = tabs[tab];
 
-  const isConnected = userSession.isUserSignedIn();
+  useEffect(() => {
+    setConnected(isConnected());
+  }, []);
 
   return (
     <div className="AppTabs">
@@ -26,13 +29,9 @@ const AppTabs = ({ addTx }) => {
             key={k}
             className={k === tab ? "selected" : ""}
             onClick={() => setTab(k)}
-            disabled={!tabs[k] || (k !== initial && !isConnected)}
+            disabled={!tabs[k] || (k !== initial && !connected)}
             title={
-              !tabs[k]
-                ? "Coming soon"
-                : isConnected
-                ? k
-                : "Connect wallet first"
+              !tabs[k] ? "Coming soon" : connected ? k : "Connect wallet first"
             }
           >
             {k}

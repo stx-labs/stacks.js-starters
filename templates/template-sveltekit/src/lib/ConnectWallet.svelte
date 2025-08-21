@@ -1,31 +1,52 @@
 <script>
-  import { showConnect } from "@stacks/connect";
-  import { userSession } from "$lib/stacksUserSession";
+  import {
+    connect,
+    disconnect,
+    getLocalStorage,
+    isConnected,
+  } from "@stacks/connect";
+  import { onMount } from 'svelte';
 
-  export function authenticate() {
-    showConnect({
-      appDetails: {
-        name: "Stacks Svelte Starter",
-        icon: window.location.origin + "/svelte.png",
-      },
-      redirectTo: "/",
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
+  let version = 0; // Reactive trigger
+
+  // Re-evaluate when version changes.
+  // The expression (version, isConnected()) ensures reactivity to 'version'.
+  $: connected = (version, isConnected());
+
+  // Re-evaluate when version or connected changes.
+  $: address = (() => {
+    version; // Explicitly depend on version to ensure re-evaluation
+    if (connected) {
+      const storage = getLocalStorage();
+      return storage?.addresses?.stx?.[0]?.address || '';
+    }
+    return '';
+  })();
+
+  onMount(() => {
+    version++; // Trigger initial state evaluation
+  });
+
+  async function authenticate() {
+    try {
+      await connect();
+      version++; // Trigger reactivity
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
+    }
   }
 
-  export function disconnect() {
-    userSession.signUserOut("/");
+  function handleDisconnect() {
+    disconnect();
+    version++; // Trigger reactivity
   }
 </script>
 
 <div>
-  {#if userSession.isUserSignedIn()}
-    <button on:click={disconnect}> Disconnect Wallet </button>
-    <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-    <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+  {#if connected}
+    <button on:click={handleDisconnect}> Disconnect Wallet </button>
+    <p>STX Address: {address}</p>
   {:else}
     <button on:click={authenticate}> Connect Wallet </button>
   {/if}

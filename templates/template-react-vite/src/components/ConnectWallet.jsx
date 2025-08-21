@@ -1,40 +1,46 @@
-import { showConnect } from "@stacks/connect";
-
-import { userSession } from "../user-session";
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks React Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { useReducer } from "react";
 
 const ConnectWallet = () => {
-  if (userSession.isUserSignedIn()) {
+  const reload = useReducer((s) => s + 1, 0)[1];
+
+  const stxAddress = isConnected()
+    ? getLocalStorage()?.addresses?.stx?.[0]?.address
+    : undefined;
+
+  async function handleConnect() {
+    try {
+      await connect();
+      reload();
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
+    }
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    reload();
+  }
+
+  if (stxAddress) {
     return (
       <div>
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>STX Address: {stxAddress}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

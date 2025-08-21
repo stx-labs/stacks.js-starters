@@ -1,48 +1,58 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
-
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Next.js Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import React, { useEffect, useState, useReducer } from "react";
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
 
 const ConnectWallet = () => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [hydrated, setHydrated] = useState(false);
+  const reload = useReducer((s) => s + 1, 0)[1];
 
-  if (mounted && userSession.isUserSignedIn()) {
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  const stxAddress =
+    hydrated && isConnected()
+      ? getLocalStorage()?.addresses?.stx?.[0]?.address
+      : undefined;
+
+  async function handleConnect() {
+    try {
+      await connect();
+      reload();
+    } catch (error) {
+      console.error("Failed to connect:", error);
+      // Optionally, handle connection error state here
+    }
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    reload();
+  }
+
+  if (!hydrated) {
+    return null; // Or a loading indicator
+  }
+
+  if (stxAddress) {
     return (
       <div className="Container">
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        <p>STX Address: {stxAddress}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

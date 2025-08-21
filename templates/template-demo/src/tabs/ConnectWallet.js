@@ -1,33 +1,28 @@
-// import { useConnect } from "@stacks/connect-react";
-import React from "react";
-import { showConnect } from "@stacks/connect";
-import { userSession } from "../userSession";
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Template",
-      icon: window.location.origin + "/logo.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
+import {
+  connect,
+  disconnect,
+  getLocalStorage,
+  isConnected,
+} from "@stacks/connect";
+import { useReducer } from "react";
 
 const ConnectWallet = () => {
+  const refresh = useReducer((x) => x + 1, 0)[1];
+
   // load account address if wallet connected
-  const isUserSignedIn = userSession.isUserSignedIn();
-  const address = isUserSignedIn
-    ? userSession.loadUserData().profile.stxAddress.testnet
+  const isUserSignedIn = isConnected();
+  const stxAddress = isUserSignedIn
+    ? getLocalStorage()?.addresses?.stx?.[0]?.address
+    : undefined;
+
+  const truncatedAddress = stxAddress
+    ? `${stxAddress.slice(0, 4)}…${stxAddress.slice(-4)}`
     : "";
-  const truncatedAddress = `${address.slice(0, 4)}…${address.slice(-4)}`;
+
+  function handleDisconnect() {
+    disconnect();
+    refresh();
+  }
 
   return (
     <div className="tab">
@@ -35,7 +30,7 @@ const ConnectWallet = () => {
       <h2>Connecting a Wallet</h2>
       <p>
         First we need to connect a Stacks wallet using the{" "}
-        <code>@stacks/connect</code> package. Calling <code>showConnect</code>{" "}
+        <code>@stacks/connect</code> package. Calling <code>connect()</code>{" "}
         (used by the "Connect Wallet" button below) will trigger the wallet
         popup to open and allow you to select an account.
       </p>
@@ -48,13 +43,19 @@ const ConnectWallet = () => {
         )}
         <hr />
         <br />
-        <button onClick={authenticate}>Connect Wallet</button>
+        <button
+          onClick={async () => {
+            await connect();
+            refresh();
+          }}
+        >
+          Connect Wallet
+        </button>
         <br />
         <br />
-        <button onClick={disconnect}>Disconnect Wallet</button>
+        <button onClick={handleDisconnect}>Disconnect Wallet</button>
         <p>
-          <strong>isUserSignedIn:</strong>{" "}
-          <code>{isUserSignedIn.toString()}</code>
+          <strong>isConnected:</strong> <code>{isConnected().toString()}</code>
         </p>
         <p>
           <strong>address</strong>: <code>{truncatedAddress}</code>
