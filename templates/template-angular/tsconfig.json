@@ -5,7 +5,7 @@
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
@@ -15,7 +15,6 @@
       "es2020",
       "dom"
     ],
-    "allowSyntheticDefaultImports": true,
     "useDefineForClassFields": false
   }
 }
