@@ -3,9 +3,10 @@ import { isConnected, request } from '@stacks/connect';
 import { Cl } from '@stacks/transactions';
 
 @Component({
-  selector: 'app-contract-vote',
-  templateUrl: './contract-vote.component.html',
-  styleUrls: ['./contract-vote.component.css'],
+    selector: 'app-contract-vote',
+    templateUrl: './contract-vote.component.html',
+    styleUrls: ['./contract-vote.component.css'],
+    standalone: false
 })
 export class ContractVoteComponent implements OnInit {
   connected = false;

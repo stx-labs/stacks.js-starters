@@ -7,9 +7,10 @@ import {
 } from '@stacks/connect';
 
 @Component({
-  selector: 'app-connect-wallet',
-  templateUrl: './connect-wallet.component.html',
-  styleUrls: ['./connect-wallet.component.css'],
+    selector: 'app-connect-wallet',
+    templateUrl: './connect-wallet.component.html',
+    styleUrls: ['./connect-wallet.component.css'],
+    standalone: false
 })
 export class ConnectWalletComponent implements OnInit {
   connected = false;
