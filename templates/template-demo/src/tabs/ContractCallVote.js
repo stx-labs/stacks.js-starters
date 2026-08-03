@@ -1,59 +1,51 @@
-import { useConnect } from "@stacks/connect-react";
-import { StacksTestnet } from "@stacks/network";
-import {
-  AnchorMode,
-  callReadOnlyFunction,
-  PostConditionMode, stringUtf8CV
-} from "@stacks/transactions";
+import { request } from "@stacks/connect";
+import { Cl, cvToValue, fetchCallReadOnlyFunction } from "@stacks/transactions";
 import { useState } from "react";
-import { userSession } from "../userSession";
+import { getStxAddress, NETWORK } from "../stacks";
 
-const testnet = new StacksTestnet();
+const CONTRACT_ADDRESS = "ST10GH0ED2YA6AN2BT94N75KMVJAC3DGARE3W1VP9";
+const CONTRACT_NAME = "slight-crimson-ape";
 
 const ContractCallVote = ({ addTx }) => {
   const [votes, setVotes] = useState();
   const [pick, setPick] = useState();
 
-  const { doContractCall } = useConnect();
+  async function vote() {
+    try {
+      // `request("stx_callContract")` replaces `doContractCall` from v7.
+      // It resolves with the txid instead of using `onFinish`/`onCancel`.
+      const response = await request("stx_callContract", {
+        contract: `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`,
+        functionName: "vote",
+        functionArgs: [Cl.stringUtf8(pick)],
+        network: NETWORK,
+      });
 
-  if (!userSession.isUserSignedIn()) {
-    return <p>Connect wallet first</p>;
-  }
-
-  const address = userSession.loadUserData().profile.stxAddress.testnet;
-
-  function vote() {
-    doContractCall({
-      network: testnet,
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST10GH0ED2YA6AN2BT94N75KMVJAC3DGARE3W1VP9",
-      contractName: "slight-crimson-ape",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        addTx(data.txId);
-        console.log("data", data);
-      },
-      onCancel: () => {
-        console.log("Transaction was canceled");
-      },
-    });
+      console.log("response", response);
+      addTx(response.txid);
+    } catch (error) {
+      // the user canceled, or the wallet returned an error
+      console.error("error", error);
+    }
   }
 
   async function refreshCount() {
-    const result = await callReadOnlyFunction({
-      contractAddress: "ST10GH0ED2YA6AN2BT94N75KMVJAC3DGARE3W1VP9",
-      contractName: "slight-crimson-ape",
+    // Read-only calls don't need a wallet — they hit a Stacks API node.
+    // v7 renamed `callReadOnlyFunction` to `fetchCallReadOnlyFunction`.
+    const result = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
       functionName: "get-data",
       functionArgs: [],
-      network: testnet,
-      senderAddress: address,
+      network: NETWORK,
+      senderAddress: getStxAddress() || CONTRACT_ADDRESS,
     });
+
+    // `cvToValue` turns the returned Clarity tuple into a plain JS object
+    const data = cvToValue(result);
     setVotes({
-      apple: Number(result.data.apple.value),
-      orange: Number(result.data.orange.value),
+      apple: Number(data.apple.value),
+      orange: Number(data.orange.value),
     });
   }
 
@@ -103,8 +95,8 @@ const ContractCallVote = ({ addTx }) => {
             onChange={(e) => setPick(e.target.value)}
           >
             <p>
-              Using <code>doContractCall</code> we can call smart contracts on
-              the Stacks blockchain.
+              Using <code>request("stx_callContract")</code> we can call smart
+              contracts on the Stacks blockchain.
             </p>
             <label htmlFor="radio-apple">
               <input type="radio" id="radio-apple" name="pick" value="🍎" />

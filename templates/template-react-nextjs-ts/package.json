@@ -5,21 +5,19 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@stacks/connect": "7.7.1",
-    "@stacks/connect-react": "22.4.2",
-    "@stacks/connect-ui": "6.4.1",
-    "next": "13.5.6",
-    "react": "^18",
-    "react-dom": "^18"
+    "@stacks/connect": "^8.2.6",
+    "@stacks/transactions": "^7.6.0",
+    "next": "16.2.12",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "typescript": "^5"
   }
 }

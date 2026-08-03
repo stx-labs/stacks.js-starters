@@ -1,38 +1,30 @@
 <script lang="ts">
-  import { showConnect } from "@stacks/connect";
-  import { userSession } from "../stacksUserSession";
+  import { wallet } from '../lib/stacks.svelte'
 
-  export function authenticate() {
-    showConnect({
-      appDetails: {
-        name: "Stacks Svelte Starter",
-        icon: window.location.origin + "/svelte.png",
-      },
-      redirectTo: "/",
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
-  }
+  let error: string | undefined = $state()
 
-  export function disconnect() {
-    userSession.signUserOut("/");
+  async function onConnect() {
+    error = undefined
+    try {
+      await wallet.connect()
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e)
+    }
   }
 </script>
 
-<div>
-  {#if userSession.isUserSignedIn()}
-    <button on:click={disconnect}> Disconnect Wallet </button>
-    <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-    <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+<div class="stacks-card">
+  {#if wallet.connected}
+    <p>Connected as <code>{wallet.stxAddress}</code></p>
+    <button type="button" class="counter" onclick={() => wallet.disconnect()}>
+      Disconnect wallet
+    </button>
   {:else}
-    <button on:click={authenticate}> Connect Wallet </button>
+    <button type="button" class="counter" onclick={onConnect}>
+      Connect wallet
+    </button>
+  {/if}
+  {#if error}
+    <p class="error">{error}</p>
   {/if}
 </div>
-
-<style>
-  div {
-    margin-top: 8px;
-  }
-</style>

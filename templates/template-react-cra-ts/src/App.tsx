@@ -1,50 +1,37 @@
-import React from "react";
-import logo from "./logo.svg";
+import { useState } from "react";
+import { isConnected } from "@stacks/connect";
+
 import "./App.css";
 
 import ConnectWallet from "./components/ConnectWallet";
 import ContractCallVote from "./components/ContractCallVote";
 
 function App() {
+  // `isConnected()` reads local storage, so mirror it in state to re-render on change
+  const [connected, setConnected] = useState(isConnected);
+  const refresh = () => setConnected(isConnected());
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <h2>React + Stacks.js</h2>
 
-        <h2>React + Stacks.js 👋</h2>
+        {/* ConnectWallet file: `./src/components/ConnectWallet.tsx` */}
+        <ConnectWallet connected={connected} onChange={refresh} />
 
-        {/* ConnectWallet file: `./src/components/ConnectWallet.js` */}
-        <ConnectWallet />
-
-        {/* ContractCallVote file: `./src/components/ContractCallVote.js` */}
-        <ContractCallVote />
+        {/* ContractCallVote file: `./src/components/ContractCallVote.tsx` */}
+        <ContractCallVote connected={connected} />
 
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
         <a
           className="App-link"
-          href="https://docs.hiro.so/intro"
+          href="https://docs.hiro.so/stacks.js"
           rel="noopener noreferrer"
           target="_blank"
         >
-          Learn Stacks
-        </a>
-        <a
-          className="App-link"
-          href="https://docs.hiro.so/build-apps/overview"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Learn to Build on Stacks
-        </a>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
+          Stacks.js docs
         </a>
       </header>
     </div>

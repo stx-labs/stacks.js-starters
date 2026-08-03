@@ -1,0 +1,78 @@
+.page {
+  --background: #fafafa;
+  --foreground: #fff;
+
+  --text-primary: #000;
+  --text-secondary: #666;
+
+  --button-secondary-hover: #f2f2f2;
+  --button-secondary-border: #ebebeb;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-sans);
+  background-color: var(--background);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+  background-color: var(--foreground);
+  padding: 80px 60px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.intro h1 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  letter-spacing: -1.92px;
+  color: var(--text-primary);
+}
+
+.intro p {
+  max-width: 440px;
+  font-size: 16px;
+  line-height: 28px;
+  color: var(--text-secondary);
+}
+
+.intro a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 48px 24px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    --background: #000;
+    --foreground: #000;
+
+    --text-primary: #ededed;
+    --text-secondary: #999;
+
+    --button-secondary-hover: #1a1a1a;
+    --button-secondary-border: #1a1a1a;
+  }
+}

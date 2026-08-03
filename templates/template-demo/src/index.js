@@ -3,28 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { Connect } from "@stacks/connect-react";
-import { userSession } from "./userSession";
+
+// @stacks/connect v8 needs no `<Connect>` provider and no `UserSession`.
+// Call `connect()` / `request()` directly from your components instead.
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Connect
-      authOptions={{
-        appDetails: {
-          name: "Stacks Template",
-          // todo:
-          // icon: window.location.origin + "/logo.png",
-        },
-        redirectTo: "/",
-        onFinish: () => {
-          window.location.reload();
-        },
-        userSession,
-      }}
-    >
-      <App />
-    </Connect>
+    <App />
   </React.StrictMode>
 );
 

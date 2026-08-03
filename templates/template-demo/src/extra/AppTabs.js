@@ -1,21 +1,20 @@
 import { useState } from "react";
 import ConnectWallet from "../tabs/ConnectWallet";
 import ContractCallVote from "../tabs/ContractCallVote";
-import { userSession } from "../userSession";
+import SignMessage from "../tabs/SignMessage";
+import StxTransfer from "../tabs/StxTransfer";
 
 const tabs = {
   "Connect Wallet": ConnectWallet,
   "Contract Interaction": ContractCallVote,
-  "Gaia Data Storage ": null,
-  "Multisig Transactions ": null,
+  "STX Transfer": StxTransfer,
+  "Message Signing": SignMessage,
 };
 const initial = Object.keys(tabs)[0];
 
-const AppTabs = ({ addTx }) => {
+const AppTabs = ({ addTx, connected, onConnectionChange }) => {
   const [tab, setTab] = useState(initial);
   const Tab = tabs[tab];
-
-  const isConnected = userSession.isUserSignedIn();
 
   return (
     <div className="AppTabs">
@@ -26,13 +25,9 @@ const AppTabs = ({ addTx }) => {
             key={k}
             className={k === tab ? "selected" : ""}
             onClick={() => setTab(k)}
-            disabled={!tabs[k] || (k !== initial && !isConnected)}
+            disabled={!tabs[k] || (k !== initial && !connected)}
             title={
-              !tabs[k]
-                ? "Coming soon"
-                : isConnected
-                ? k
-                : "Connect wallet first"
+              !tabs[k] ? "Coming soon" : connected ? k : "Connect wallet first"
             }
           >
             {k}
@@ -40,7 +35,11 @@ const AppTabs = ({ addTx }) => {
         ))}
       </div>
       <br />
-      <Tab addTx={addTx} />
+      <Tab
+        addTx={addTx}
+        connected={connected}
+        onConnectionChange={onConnectionChange}
+      />
     </div>
   );
 };

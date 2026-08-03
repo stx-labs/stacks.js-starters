@@ -1,0 +1,10 @@
+@if (stacks.connected()) {
+  <div>
+    <button type="button" (click)="disconnect()">Disconnect Wallet</button>
+    <p>connected: {{ stacks.stxAddress() }}</p>
+  </div>
+} @else {
+  <div>
+    <button type="button" (click)="connect()">Connect Wallet</button>
+  </div>
+}

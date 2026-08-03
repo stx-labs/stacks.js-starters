@@ -1,8 +1,18 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
+// `@stacks/connect` v8 ships as ESM, which Create React App's Jest setup does not
+// transform. Mocking it keeps this smoke test running without extra Jest config.
+jest.mock("@stacks/connect", () => ({
+  connect: jest.fn(),
+  disconnect: jest.fn(),
+  isConnected: jest.fn(() => false),
+  getLocalStorage: jest.fn(() => null),
+  request: jest.fn(),
+}));
+
+import App from "./App";
+
+test("renders connect wallet button", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText(/connect wallet/i)).toBeInTheDocument();
 });

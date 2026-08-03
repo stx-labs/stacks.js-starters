@@ -1,27 +1,17 @@
-# React + TypeScript + Vite
+# React + TypeScript + Vite + Stacks.js
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal Vite + React starter with a [Stacks.js](https://docs.hiro.so/stacks.js) demo.
 
-Currently, two official plugins are available:
+- `src/hooks/use-wallet.ts` — wallet state via `connect()`, `disconnect()`, `isConnected()`, `getLocalStorage()` from `@stacks/connect` (v8)
+- `src/components/ConnectWallet.tsx` — connect/disconnect button and the connected STX address
+- `src/components/ContractCallVote.tsx` — contract call via `request('stx_callContract', ...)` against an example testnet voting contract
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Connect requires a Stacks wallet (e.g. [Leather](https://leather.io/) or [Xverse](https://www.xverse.app/)) installed in the browser.
 
-## Expanding the ESLint configuration
+## Run
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```sh
+npm install
+npm run dev
+npm run build
 ```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

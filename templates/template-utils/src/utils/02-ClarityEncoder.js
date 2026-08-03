@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { parse } from "@stacks/transactions/dist/clarity/parser";
-import { bytesToHex } from "@stacks/common";
+import { useState } from "react";
 import { Cl } from "@stacks/transactions";
 
 const ClarityEncoder = () => {
@@ -10,8 +8,8 @@ const ClarityEncoder = () => {
 
   const encodeClarity = (clarity) => {
     try {
-      const hex = bytesToHex(Cl.serialize(parse(clarity)));
-      return `0x${hex}`;
+      // `Cl.parse` reads Clarity syntax, `Cl.serialize` returns a hex string (v7)
+      return `0x${Cl.serialize(Cl.parse(clarity))}`;
     } catch (err) {
       setError(`Failed to encode: ${err}`);
       return "";
@@ -20,8 +18,8 @@ const ClarityEncoder = () => {
 
   const decodeHex = (hex) => {
     try {
-      const repr = Cl.deserialize(hex);
-      return Cl.prettyPrint(repr);
+      // `Cl.deserialize` accepts hex (with or without `0x`) or bytes
+      return Cl.prettyPrint(Cl.deserialize(hex));
     } catch (err) {
       setError(`Failed to decode: ${err}`);
       return "";
@@ -45,33 +43,33 @@ const ClarityEncoder = () => {
   };
 
   return (
-    <div className="bg-white p-5 rounded-lg relative">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Clarity Encoder</h2>
-      {error && (
-        <div className="absolute right-0 top-0 mt-2 mr-2 w-2 h-2 bg-red-400 rounded-full" />
-      )}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <label className="col-span-1 mt-2 flex items-start text-gray-700 text-sm font-bold">
-          Clarity Value
-        </label>
+    <div className="Card">
+      <h2>
+        Clarity Encoder {error && <span className="Dot" title={error} />}
+      </h2>
+      <div className="Row">
+        <label htmlFor="clarity">Clarity Value</label>
         <textarea
+          id="clarity"
+          className="Mono"
+          rows="3"
           value={clarityValueString}
           onChange={handleClarityChange}
-          className="font-mono col-span-2 border rounded p-3 text-gray-700 leading-tight focus:outline-none resize-none"
-          rows="3"
+          placeholder="(ok u1)"
         />
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        <label className="col-span-1 flex items-center text-gray-700 text-sm font-bold">
-          Hex
-        </label>
+      <div className="Row">
+        <label htmlFor="hex">Hex</label>
         <input
+          id="hex"
+          className="Mono"
           type="text"
           value={hex}
           onChange={handleHexChange}
-          className="font-mono col-span-2 appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          placeholder="0x07..."
         />
       </div>
+      {error && <p className="Error">{error}</p>}
     </div>
   );
 };

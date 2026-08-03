@@ -11,16 +11,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
 }
 
 a {
@@ -45,6 +35,11 @@ h1 {
   line-height: 1.1;
 }
 
+code {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.9em;
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -64,15 +59,24 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.card {
-  padding: 2em;
-}
-
 #app {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.stacks-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  padding: 1em 0;
+}
+
+.stacks-actions {
+  display: flex;
+  gap: 0.5em;
 }
 
 @media (prefers-color-scheme: light) {

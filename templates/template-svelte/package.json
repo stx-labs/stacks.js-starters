@@ -8,14 +8,13 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.4.2",
-    "svelte": "^4.0.5",
-    "vite": "^4.4.5"
-  },
   "dependencies": {
-    "@stacks/connect": "7.7.1",
-    "@stacks/connect-react": "22.4.2",
-    "@stacks/connect-ui": "6.4.1"
+    "@stacks/connect": "^8.2.6",
+    "@stacks/transactions": "^7.6.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte": "^5.56.8",
+    "vite": "^8.2.0"
   }
 }
