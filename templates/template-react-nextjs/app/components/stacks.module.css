@@ -1,0 +1,50 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+}
+
+.container h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #000);
+}
+
+.address {
+  font-family: var(--font-geist-mono), monospace;
+  word-break: break-all;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 128px;
+  border: 1px solid var(--button-secondary-border, #ebebeb);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background: var(--button-secondary-hover, #f2f2f2);
+    border-color: transparent;
+  }
+}

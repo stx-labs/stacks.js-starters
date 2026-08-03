@@ -1,46 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
+// 1 STX = 1,000,000 microSTX
+const MICRO_STX_IN_STX = 1_000_000;
 
 const Units = () => {
   const [stx, setStx] = useState("");
   const [microStx, setMicroStx] = useState("");
 
   const handleStxChange = (e) => {
-    const stxs = e.target.value;
-    setStx(stxs);
-    setMicroStx(stxs * 1000000); // 1 STX = 1,000,000 microSTX
+    const value = e.target.value;
+    setStx(value);
+    setMicroStx(value === "" ? "" : Number(value) * MICRO_STX_IN_STX);
   };
 
   const handleMicroStxChange = (e) => {
-    const microStxs = e.target.value;
-    setMicroStx(microStxs);
-    setStx(microStxs / 1000000);
+    const value = e.target.value;
+    setMicroStx(value);
+    setStx(value === "" ? "" : Number(value) / MICRO_STX_IN_STX);
   };
 
   return (
-    <div className="bg-white p-5 rounded-lg">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
-        STX Unit Converter
-      </h2>
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <label className="col-span-1 flex items-center text-gray-700 text-sm font-bold">
-          STX
-        </label>
+    <div className="Card">
+      <h2>STX Unit Converter</h2>
+      <div className="Row">
+        <label htmlFor="stx">STX</label>
         <input
+          id="stx"
+          className="Mono"
           type="number"
           value={stx}
           onChange={handleStxChange}
-          className="font-mono col-span-2 appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        <label className="col-span-1 flex items-center text-gray-700 text-sm font-bold">
-          microSTX
-        </label>
+      <div className="Row">
+        <label htmlFor="microStx">microSTX</label>
         <input
+          id="microStx"
+          className="Mono"
           type="number"
           value={microStx}
           onChange={handleMicroStxChange}
-          className="font-mono col-span-2 appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
       </div>
     </div>

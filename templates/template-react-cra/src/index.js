@@ -4,28 +4,12 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
-import { Connect } from "@stacks/connect-react";
-
-import { userSession } from "./components/ConnectWallet";
+// @stacks/connect v8 needs no provider — call `connect()`/`request()` directly
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Connect
-      authOptions={{
-        appDetails: {
-          name: "Stacks React Template",
-          icon: window.location.origin + "/logo.png",
-        },
-        redirectTo: "/",
-        onFinish: () => {
-          window.location.reload();
-        },
-        userSession,
-      }}
-    >
-      <App />
-    </Connect>
+    <App />
   </React.StrictMode>
 );
 

@@ -1,38 +1,18 @@
-# create-svelte
+# SvelteKit + Stacks.js (TypeScript)
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+A minimal SvelteKit (Svelte 5) starter showing how to connect a Stacks wallet with
+`@stacks/connect` v8 and call a Clarity smart contract function.
 
-## Creating a project
+- `src/lib/stacks.svelte.ts` — reactive wallet state (`connect`, `disconnect`, `isConnected`, `getLocalStorage`)
+- `src/lib/ConnectWallet.svelte` — connect/disconnect button and the connected STX address
+- `src/lib/ContractVote.svelte` — `request('stx_callContract', …)` example on testnet
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Usage
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+See the [Stacks.js documentation](https://docs.hiro.so/stacks.js) for more.

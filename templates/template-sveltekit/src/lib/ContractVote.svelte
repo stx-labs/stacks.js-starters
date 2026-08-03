@@ -1,57 +1,46 @@
 <script>
-  import { openContractCall } from "@stacks/connect";
-  import { StacksTestnet } from "@stacks/network";
-  import {
-    AnchorMode,
-    PostConditionMode,
-    stringUtf8CV,
-  } from "@stacks/transactions";
-  import { userSession } from "$lib/stacksUserSession";
+	import { request } from '@stacks/connect';
+	import { Cl } from '@stacks/transactions';
+	import { wallet } from '$lib/stacks.svelte.js';
 
-  export function vote(pick) {
-    openContractCall({
-      network: new StacksTestnet(),
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK",
-      contractName: "example-fruit-vote-contract",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        console.log("onFinish:", data);
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            "_blank"
-          )
-          .focus();
-      },
-      onCancel: () => {
-        console.log("onCancel:", "Transaction was canceled");
-      },
-    });
-  }
+	/** @param {string} pick */
+	async function vote(pick) {
+		try {
+			const response = await request('stx_callContract', {
+				contract: 'ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK.example-fruit-vote-contract',
+				functionName: 'vote',
+				functionArgs: [Cl.stringUtf8(pick)],
+				network: 'testnet'
+			});
+
+			console.log('txid:', response.txid);
+			window
+				.open(`https://explorer.hiro.so/txid/${response.txid}?chain=testnet`, '_blank')
+				?.focus();
+		} catch (error) {
+			console.log('cancelled or failed:', error);
+		}
+	}
 </script>
 
-{#if userSession.isUserSignedIn()}
-  <div>
-    <p>Vote via Smart Contract</p>
-    <button on:click={() => vote("🍊")}> Vote for 🍊 </button>
-    <button on:click={() => vote("🍎")}> Vote for 🍎 </button>
-  </div>
+{#if wallet.connected}
+	<div>
+		<p>Vote via Smart Contract</p>
+		<button onclick={() => vote('🍊')}>Vote for 🍊</button>
+		<button onclick={() => vote('🍎')}>Vote for 🍎</button>
+	</div>
 {/if}
 
 <style>
-  div {
-    margin-top: 16px;
-  }
+	div {
+		margin-top: 16px;
+	}
 
-  button {
-    background-color: rgba(148, 48, 148, 0.2);
-    border: 2px solid rgb(148, 48, 148);
-    border-radius: 14px;
-    padding: 8px 12px;
-    margin: 4px;
-  }
+	button {
+		background-color: rgba(148, 48, 148, 0.2);
+		border: 2px solid rgb(148, 48, 148);
+		border-radius: 14px;
+		padding: 8px 12px;
+		margin: 4px;
+	}
 </style>

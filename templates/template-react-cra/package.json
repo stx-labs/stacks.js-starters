@@ -3,16 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stacks/connect": "7.7.1",
-    "@stacks/connect-react": "22.4.2",
-    "@stacks/connect-ui": "6.4.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@stacks/connect": "^8.2.6",
+    "@stacks/transactions": "^7.6.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^5.1.0"
+  },
+  "overrides": {
+    "typescript": "5.9.3"
   },
   "scripts": {
     "start": "react-scripts start",

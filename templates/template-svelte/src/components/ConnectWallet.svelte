@@ -1,38 +1,29 @@
 <script>
-  import { showConnect } from "@stacks/connect";
-  import { userSession } from "../stacksUserSession";
+  import { connectWallet, disconnectWallet, wallet, NETWORK } from '../lib/stacks.svelte.js'
 
-  export function authenticate() {
-    showConnect({
-      appDetails: {
-        name: "Stacks Svelte Starter",
-        icon: window.location.origin + "/svelte.png",
-      },
-      redirectTo: "/",
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
-  }
-
-  export function disconnect() {
-    userSession.signUserOut("/");
+  async function onConnect() {
+    try {
+      await connectWallet()
+    } catch (error) {
+      console.log('connect canceled or failed:', error)
+    }
   }
 </script>
 
-<div>
-  {#if userSession.isUserSignedIn()}
-    <button on:click={disconnect}> Disconnect Wallet </button>
-    <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-    <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+<div class="stacks-block">
+  {#if wallet.connected}
+    <button type="button" onclick={disconnectWallet}>Disconnect wallet</button>
+    <p>{NETWORK}: <code>{wallet.stxAddress}</code></p>
   {:else}
-    <button on:click={authenticate}> Connect Wallet </button>
+    <button type="button" onclick={onConnect}>Connect wallet</button>
   {/if}
 </div>
 
 <style>
-  div {
-    margin-top: 8px;
+  .stacks-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 </style>

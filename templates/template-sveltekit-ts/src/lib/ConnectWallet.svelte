@@ -1,47 +1,40 @@
 <script lang="ts">
-  import { showConnect } from "@stacks/connect";
-  import { userSession } from "$lib/stacksUserSession";
+	import { wallet } from '$lib/stacks.svelte';
 
-  export function authenticate() {
-    showConnect({
-      appDetails: {
-        name: "Stacks Svelte Starter",
-        icon: window.location.origin + "/svelte.png",
-      },
-      redirectTo: "/",
-      onFinish: () => {
-        window.location.reload();
-      },
-      userSession,
-    });
-  }
+	// Local storage is only available in the browser, so sync after mount.
+	$effect(() => {
+		wallet.sync();
+	});
 
-  export function disconnect() {
-    userSession.signUserOut("/");
-  }
+	async function authenticate() {
+		try {
+			await wallet.connect();
+		} catch (error) {
+			console.log('connect error:', error);
+		}
+	}
 </script>
 
 <div>
-  {#if userSession.isUserSignedIn()}
-    <button on:click={disconnect}> Disconnect Wallet </button>
-    <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-    <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
-  {:else}
-    <button on:click={authenticate}> Connect Wallet </button>
-  {/if}
+	{#if wallet.connected}
+		<button onclick={() => wallet.disconnect()}> Disconnect Wallet </button>
+		<p>address: {wallet.stxAddress}</p>
+	{:else}
+		<button onclick={authenticate}> Connect Wallet </button>
+	{/if}
 </div>
 
 <style>
-  div {
-    margin-top: 8px;
-  }
+	div {
+		margin-top: 8px;
+	}
 
-  button {
-    margin: 8px;
-    background-color: #bbb;
-    border: 2px solid #777;
-    border-radius: 28px;
-    font-size: 18px;
-    padding: 16px 24px;
-  }
+	button {
+		margin: 8px;
+		background-color: #bbb;
+		border: 2px solid #777;
+		border-radius: 28px;
+		font-size: 18px;
+		padding: 16px 24px;
+	}
 </style>

@@ -1,43 +1,24 @@
-import { showConnect } from "@stacks/connect";
+import { useWallet } from '../hooks/use-wallet'
 
-import { userSession } from "../user-session";
+export default function ConnectWallet() {
+  const { connected, address, login, logout } = useWallet()
 
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks React Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
-
-function disconnect() {
-  userSession.signUserOut("/");
-}
-
-const ConnectWallet = () => {
-  if (userSession.isUserSignedIn()) {
+  if (!connected) {
     return (
-      <div>
-        <button className="Connect" onClick={disconnect}>
-          Disconnect Wallet
-        </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
-      </div>
-    );
+      <button type="button" className="counter" onClick={() => void login()}>
+        Connect Wallet
+      </button>
+    )
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
-      Connect Wallet
-    </button>
-  );
-};
-
-export default ConnectWallet;
+    <div className="stacks-panel">
+      <p>
+        Connected as <code>{address}</code>
+      </p>
+      <button type="button" className="counter" onClick={logout}>
+        Disconnect Wallet
+      </button>
+    </div>
+  )
+}

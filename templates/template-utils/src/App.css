@@ -1,0 +1,79 @@
+.App {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.Card {
+  background-color: #282c34;
+  border: 1px solid #3a3f4b;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.Card h1,
+.Card h2 {
+  margin: 0 0 12px;
+}
+
+.Card h2 {
+  font-size: 20px;
+}
+
+.Muted {
+  color: #a5adba;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.Link {
+  color: #61dafb;
+}
+
+.Row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.Row label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.Row input,
+.Row textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #1c1f26;
+  color: #eee;
+  border: 1px solid #3a3f4b;
+  border-radius: 6px;
+  padding: 8px 10px;
+  resize: none;
+}
+
+.Row input:focus,
+.Row textarea:focus {
+  outline: 2px solid #61dafb;
+}
+
+.Dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f87171;
+  vertical-align: middle;
+}
+
+.Error {
+  color: #f87171;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}

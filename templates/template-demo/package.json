@@ -3,24 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stacks/connect": "7.7.1",
-    "@stacks/connect-react": "22.4.2",
-    "@stacks/connect-ui": "6.4.1",
-    "@stacks/network": "^6.1.0",
-    "@stacks/transactions": "^6.1.0",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^3.1.1"
+    "@stacks/connect": "^8.2.6",
+    "@stacks/transactions": "^7.6.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^5.1.0"
+  },
+  "overrides": {
+    "@rushstack/eslint-patch": "1.5.1",
+    "typescript": "4.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\](?!(@stacks|@noble|@scure|uint8array-tools)[/\\\\]).+\\.(js|mjs|jsx|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ]
   },
   "eslintConfig": {
     "extends": [

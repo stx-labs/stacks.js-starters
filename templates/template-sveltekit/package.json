@@ -1,26 +1,27 @@
 {
 	"name": "template-sveltekit-new",
-	"version": "0.0.1",
 	"private": true,
+	"version": "0.0.1",
+	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.20.4",
-		"svelte": "^4.0.5",
-		"svelte-check": "^3.4.3",
-		"typescript": "^5.0.0",
-		"vite": "^4.4.2"
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.63.0",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"svelte": "^5.56.1",
+		"svelte-check": "^4.6.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.16"
 	},
-	"type": "module",
 	"dependencies": {
-		"@stacks/connect": "7.7.1",
-		"@stacks/connect-react": "22.4.2",
-		"@stacks/connect-ui": "6.4.1"
+		"@stacks/connect": "^8.2.6",
+		"@stacks/transactions": "^7.6.0"
 	}
 }

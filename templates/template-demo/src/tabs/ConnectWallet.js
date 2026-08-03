@@ -1,33 +1,22 @@
-// import { useConnect } from "@stacks/connect-react";
 import React from "react";
-import { showConnect } from "@stacks/connect";
-import { userSession } from "../userSession";
+import { connect, disconnect } from "@stacks/connect";
+import { getStxAddress, truncateAddress } from "../stacks";
 
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks Template",
-      icon: window.location.origin + "/logo.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
-}
+const ConnectWallet = ({ connected, onConnectionChange }) => {
+  async function handleConnect() {
+    // `connect()` opens the wallet selector and caches the returned addresses
+    // in local storage. It replaces `showConnect`/`authenticate` from v7.
+    await connect();
+    onConnectionChange();
+  }
 
-function disconnect() {
-  userSession.signUserOut("/");
-}
+  function handleDisconnect() {
+    // clears local storage and the remembered wallet selection
+    disconnect();
+    onConnectionChange();
+  }
 
-const ConnectWallet = () => {
-  // load account address if wallet connected
-  const isUserSignedIn = userSession.isUserSignedIn();
-  const address = isUserSignedIn
-    ? userSession.loadUserData().profile.stxAddress.testnet
-    : "";
-  const truncatedAddress = `${address.slice(0, 4)}…${address.slice(-4)}`;
+  const address = getStxAddress();
 
   return (
     <div className="tab">
@@ -35,29 +24,28 @@ const ConnectWallet = () => {
       <h2>Connecting a Wallet</h2>
       <p>
         First we need to connect a Stacks wallet using the{" "}
-        <code>@stacks/connect</code> package. Calling <code>showConnect</code>{" "}
-        (used by the "Connect Wallet" button below) will trigger the wallet
-        popup to open and allow you to select an account.
+        <code>@stacks/connect</code> package. Calling <code>connect</code> (used
+        by the "Connect Wallet" button below) will trigger the wallet popup to
+        open and allow you to select an account.
       </p>
       {/* example */}
       <div className="frame">
-        {isUserSignedIn ? (
+        {connected ? (
           <p>Wallet is currently connected! 🎉</p>
         ) : (
           <p>Wallet is currently NOT connected!</p>
         )}
         <hr />
         <br />
-        <button onClick={authenticate}>Connect Wallet</button>
+        <button onClick={handleConnect}>Connect Wallet</button>
         <br />
         <br />
-        <button onClick={disconnect}>Disconnect Wallet</button>
+        <button onClick={handleDisconnect}>Disconnect Wallet</button>
         <p>
-          <strong>isUserSignedIn:</strong>{" "}
-          <code>{isUserSignedIn.toString()}</code>
+          <strong>isConnected:</strong> <code>{connected.toString()}</code>
         </p>
         <p>
-          <strong>address</strong>: <code>{truncatedAddress}</code>
+          <strong>address</strong>: <code>{truncateAddress(address)}</code>
         </p>
 
         {/* file name */}

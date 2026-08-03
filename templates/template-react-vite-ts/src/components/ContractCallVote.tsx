@@ -1,56 +1,44 @@
-import { useConnect } from "@stacks/connect-react";
-import { StacksTestnet } from "@stacks/network";
-import {
-  AnchorMode,
-  PostConditionMode,
-  stringUtf8CV,
-} from "@stacks/transactions";
+import { request } from '@stacks/connect'
+import { Cl } from '@stacks/transactions'
+import { useWallet } from '../hooks/use-wallet'
 
-import { userSession } from "../user-session";
+const CONTRACT =
+  'ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK.example-fruit-vote-contract'
 
-const ContractCallVote = () => {
-  const { doContractCall } = useConnect();
+export default function ContractCallVote() {
+  const { connected } = useWallet()
 
-  function vote(pick: string) {
-    doContractCall({
-      network: new StacksTestnet(),
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK",
-      contractName: "example-fruit-vote-contract",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        console.log("onFinish:", data);
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            "_blank"
-          )
-          ?.focus();
-      },
-      onCancel: () => {
-        console.log("onCancel:", "Transaction was canceled");
-      },
-    });
+  async function vote(pick: string) {
+    try {
+      const response = await request('stx_callContract', {
+        contract: CONTRACT,
+        functionName: 'vote',
+        functionArgs: [Cl.stringUtf8(pick)],
+        network: 'testnet',
+      })
+      console.log('vote:', response)
+      window
+        .open(
+          `https://explorer.hiro.so/txid/${response.txid}?chain=testnet`,
+          '_blank',
+        )
+        ?.focus()
+    } catch (error) {
+      console.error('vote canceled or failed:', error)
+    }
   }
 
-  if (!userSession.isUserSignedIn()) {
-    return null;
-  }
+  if (!connected) return null
 
   return (
-    <div>
+    <div className="stacks-panel">
       <p>Vote via Smart Contract</p>
-      <button className="Vote" onClick={() => vote("🍊")}>
+      <button type="button" onClick={() => void vote('🍊')}>
         Vote for 🍊
       </button>
-      <button className="Vote" onClick={() => vote("🍎")}>
+      <button type="button" onClick={() => void vote('🍎')}>
         Vote for 🍎
       </button>
     </div>
-  );
-};
-
-export default ContractCallVote;
+  )
+}

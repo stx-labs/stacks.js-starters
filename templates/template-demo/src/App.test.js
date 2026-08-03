@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn hiro docs link", () => {
+test("renders stacks.js docs link", () => {
   render(<App />);
-  const element = screen.getByText(/hiro docs/i);
+  const element = screen.getByText(/stacks\.js docs/i);
   expect(element).toBeInTheDocument();
 });

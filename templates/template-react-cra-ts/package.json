@@ -3,26 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stacks/connect": "7.7.1",
-    "@stacks/connect-react": "22.4.2",
-    "@stacks/connect-ui": "6.4.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@stacks/connect": "^8.2.6",
+    "@stacks/transactions": "^7.6.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.59",
-    "@types/react": "^18.2.29",
-    "@types/react-dom": "^18.2.14",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@types/node": "^20.19.9",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "typescript": "5.9.3",
+    "web-vitals": "^5.1.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  },
+  "overrides": {
+    "typescript": "5.9.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "dev": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env CI=false GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

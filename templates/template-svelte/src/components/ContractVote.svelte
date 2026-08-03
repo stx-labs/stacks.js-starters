@@ -1,49 +1,48 @@
 <script>
-  import { openContractCall } from "@stacks/connect";
-  import { StacksTestnet } from "@stacks/network";
-  import {
-    AnchorMode,
-    PostConditionMode,
-    stringUtf8CV,
-  } from "@stacks/transactions";
-  import { userSession } from "../stacksUserSession";
+  import { request } from '@stacks/connect'
+  import { Cl } from '@stacks/transactions'
+  import { wallet, NETWORK } from '../lib/stacks.svelte.js'
 
-  export function vote(pick) {
-    openContractCall({
-      network: new StacksTestnet(),
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK",
-      contractName: "example-fruit-vote-contract",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        console.log("onFinish:", data);
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            "_blank"
-          )
-          .focus();
-      },
-      onCancel: () => {
-        console.log("onCancel:", "Transaction was canceled");
-      },
-    });
+  const CONTRACT = 'ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK.example-fruit-vote-contract'
+
+  /** @param {string} pick */
+  async function vote(pick) {
+    try {
+      const response = await request('stx_callContract', {
+        contract: CONTRACT,
+        functionName: 'vote',
+        functionArgs: [Cl.stringUtf8(pick)],
+        network: NETWORK,
+      })
+      console.log('contract call:', response)
+      window
+        .open(`https://explorer.hiro.so/txid/${response.txid}?chain=${NETWORK}`, '_blank')
+        ?.focus()
+    } catch (error) {
+      console.log('contract call canceled or failed:', error)
+    }
   }
 </script>
 
-{#if userSession.isUserSignedIn()}
-  <div>
-    <p>Vote via Smart Contract</p>
-    <button on:click={() => vote("🍊")}> Vote for 🍊 </button>
-    <button on:click={() => vote("🍎")}> Vote for 🍎 </button>
+{#if wallet.connected}
+  <div class="stacks-block">
+    <p>Vote via smart contract</p>
+    <div class="row">
+      <button type="button" onclick={() => vote('🍊')}>Vote for 🍊</button>
+      <button type="button" onclick={() => vote('🍎')}>Vote for 🍎</button>
+    </div>
   </div>
 {/if}
 
 <style>
-  div {
-    margin-top: 16px;
+  .stacks-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .row {
+    display: flex;
+    gap: 12px;
   }
 </style>

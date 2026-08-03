@@ -1,43 +1,43 @@
-import React from "react";
-import { AppConfig, showConnect, UserSession } from "@stacks/connect";
+import { connect, disconnect, getLocalStorage } from "@stacks/connect";
 
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
-
-function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "Stacks React Starter",
-      icon: window.location.origin + "/logo512.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      window.location.reload();
-    },
-    userSession,
-  });
+/** Read the STX address that `connect()` cached in local storage. */
+export function getStxAddress() {
+  return getLocalStorage()?.addresses?.stx?.[0]?.address;
 }
 
-function disconnect() {
-  userSession.signUserOut("/");
-}
+const ConnectWallet = ({
+  connected,
+  onChange,
+}: {
+  connected: boolean;
+  onChange: () => void;
+}) => {
+  async function handleConnect() {
+    // `connect()` opens the wallet selector and caches the address in local storage
+    await connect();
+    onChange();
+  }
 
-const ConnectWallet = () => {
-  if (userSession.isUserSignedIn()) {
+  function handleDisconnect() {
+    // clears local storage and the selected wallet
+    disconnect();
+    onChange();
+  }
+
+  if (connected) {
     return (
       <div>
-        <button className="Connect" onClick={disconnect}>
+        <button className="Connect" onClick={handleDisconnect}>
           Disconnect Wallet
         </button>
-        <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p>
+        {/* @stacks/connect v8 only returns the currently selected network's address */}
+        <p>stx address: {getStxAddress()}</p>
       </div>
     );
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button className="Connect" onClick={handleConnect}>
       Connect Wallet
     </button>
   );

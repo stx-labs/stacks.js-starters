@@ -1,41 +1,32 @@
-import { useConnect } from "@stacks/connect-react";
-import { StacksTestnet } from "@stacks/network";
-import {
-  AnchorMode,
-  PostConditionMode,
-  stringUtf8CV,
-} from "@stacks/transactions";
-import { userSession } from "./ConnectWallet";
+import { request } from "@stacks/connect";
+import { Cl } from "@stacks/transactions";
 
-const ContractCallVote = () => {
-  const { doContractCall } = useConnect();
+const ContractCallVote = ({ connected }: { connected: boolean }) => {
+  async function vote(pick: string) {
+    try {
+      // `request` replaces the v7 `openContractCall`/`doContractCall` helpers
+      const response = await request("stx_callContract", {
+        contract:
+          "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK.example-fruit-vote-contract",
+        functionName: "vote",
+        functionArgs: [Cl.stringUtf8(pick)],
+        network: "testnet",
+      });
 
-  function vote(pick: string) {
-    doContractCall({
-      network: new StacksTestnet(),
-      anchorMode: AnchorMode.Any,
-      contractAddress: "ST39MJ145BR6S8C315AG2BD61SJ16E208P1FDK3AK",
-      contractName: "example-fruit-vote-contract",
-      functionName: "vote",
-      functionArgs: [stringUtf8CV(pick)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: [],
-      onFinish: (data) => {
-        console.log("onFinish:", data);
-        window
-          .open(
-            `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`,
-            "_blank"
-          )
-          ?.focus();
-      },
-      onCancel: () => {
-        console.log("onCancel:", "Transaction was canceled");
-      },
-    });
+      console.log("response:", response);
+      window
+        .open(
+          `https://explorer.hiro.so/txid/${response.txid}?chain=testnet`,
+          "_blank"
+        )
+        ?.focus();
+    } catch (error) {
+      // the user canceled, or the wallet returned an error
+      console.error("error:", error);
+    }
   }
 
-  if (!userSession.isUserSignedIn()) {
+  if (!connected) {
     return null;
   }
 

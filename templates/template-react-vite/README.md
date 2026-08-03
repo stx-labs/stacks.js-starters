@@ -1,8 +1,17 @@
-# React + Vite
+# React + Vite + Stacks.js
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal React + Vite setup with a [Stacks.js](https://docs.hiro.so/stacks.js) demo.
 
-Currently, two official plugins are available:
+- `src/hooks/use-wallet.js` — wallet state via `connect()`, `disconnect()`, `isConnected()`, and `getLocalStorage()` from `@stacks/connect` (v8)
+- `src/components/ConnectWallet.jsx` — connect/disconnect button and the connected STX address
+- `src/components/ContractCallVote.jsx` — contract call via `request('stx_callContract', ...)` against an example testnet voting contract
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Requires a Stacks wallet (e.g. [Leather](https://leather.io/) or [Xverse](https://www.xverse.app/)) installed in the browser.
+
+## Getting started
+
+```sh
+npm install
+npm run dev
+npm run build
+```
